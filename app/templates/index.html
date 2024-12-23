@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}"> -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        /* General Styling */
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body.dark-mode {
+            background-color: #121212;
+            color: #ffffff;
+        }
+
+        header {
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        /* Horizontal Navbar */
+        .navbar {
+            display: flex;
+            justify-content: flex-start;
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .navbar a {
+            color: white;
+            padding: 15px 20px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .navbar a:hover {
+            background-color: #575757;
+        }
+
+        /* Theme Toggle Icon */
+        .toggle-icon {
+            font-size: 24px;
+            cursor: pointer;
+            color: #333;
+            z-index: 1000;
+            transition: color 0.3s;
+        }
+
+        body.dark-mode .toggle-icon {
+            color: white;
+        }
+
+        /* Carousel */
+.carousel {
+    margin: 20px auto;
+    height: 50%;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+.carousel-container img {
+    display: block; /* Ensure the image is visible */
+    max-height: 50vh; /* Limit the image height to 50% of the viewport height */
+    width: auto; /* Maintain aspect ratio */
+    margin: 0 auto; /* Center the image horizontally */
+    border-radius: 10px;
+    object-fit: contain; /* Ensure the entire image fits without cropping */
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+}
+
+
+        /* Footer */
+        footer {
+            padding: 20px;
+            background-color: #333;
+            color: white;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Roadpatch</h1>
+
+        <!-- Horizontal Navbar -->
+        <nav>
+            <ul class="navbar">
+                <li><a href="/login">Report</a></li>
+                <li><a href="/admin">Admin Dashboard</a></li>
+                <li><a href="#contact">Contact Us</a></li>
+                <li><a href="/details">More Details</a></li>
+            </ul>
+        </nav>
+
+        <!-- Theme Toggle Icon -->
+        <div class="toggle-icon" id="toggleTheme">🌙</div>
+    </header>
+
+    <!-- Carousel Section -->
+    <section class="carousel" id="carousel">
+        <div class="carousel-container">
+            <img src="{{ url_for('static', filename='images/image1.jpg') }}" alt="Image 1">
+            <img src="{{ url_for('static', filename='images/image6.webp') }}" alt="Image 6">
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact">
+        <h3>Contact Us</h3>
+        <p>Email: support@potholesystem.com</p>
+        <p>Phone: +123 456 7890</p>
+    </footer>
+
+    <script>
+        // Theme Toggle Logic
+        const toggleButton = document.getElementById('toggleTheme');
+        toggleButton.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            toggleButton.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+        });
+
+        // Carousel Logic
+        $(document).ready(function () {
+            let currentImage = 0;
+            const images = $('.carousel-container img');
+            const totalImages = images.length;
+
+            function showImage(index) {
+                images.hide();
+                images.eq(index).fadeIn(1000);
+            }
+
+            setInterval(() => {
+                currentImage = (currentImage + 1) % totalImages;
+                showImage(currentImage);
+            }, 5000);
+
+            showImage(currentImage);
+        });
+    </script>
+</body>
+</html>

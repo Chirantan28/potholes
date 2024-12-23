@@ -1,0 +1,254 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>Dashboard</h1>
+    
+    
+    <a href="/upload_pothole" class="button">Report a new Pothole</a><br><br>
+
+    <h2>Previously Reported Potholes</h2>
+    {% if potholes %}
+        <table>
+            <tr>
+                <th>Location</th>
+                <th>Status</th>
+                <th>Image</th>
+            </tr>
+            {% for pothole in potholes %}
+            <tr>
+                <td>{{ pothole.location }}</td>
+                <td>{{ pothole.status }}</td>
+                <td><img src="{{ url_for('main.pothole_image', pothole_id=pothole.id) }}" alt="Pothole Image">
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>No potholes reported yet.</p>
+    {% endif %}
+
+    {% if session.get('user_id') %}
+   
+    <a href="{{ url_for('main.logout') }}">Logout</a>
+{% else %}
+   
+    <a href="{{ url_for('main.login') }}">Login</a>
+{% endif %}
+
+</body>
+</html>  -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        /* General Styling */
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body.dark-mode {
+            background-color: #121212;
+            color: #ffffff;
+        }
+
+        header {
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            text-align: center;
+            font-size: 24px;
+        }
+
+        /* Side Navigation Bar */
+        .side-nav {
+            position: fixed;
+            left: -200px; /* Hidden by default */
+            top: 0;
+            height: 100%;
+            width: 200px;
+            background-color: #333;
+            display: flex;
+            flex-direction: column;
+            padding-top: 60px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+            transition: left 0.3s;
+        }
+
+        .side-nav.open {
+            left: 0; /* Slide in when open */
+        }
+
+        .side-nav a {
+            color: white;
+            padding: 15px 20px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .side-nav a:hover {
+            background-color: #575757;
+        }
+
+        /* Nav Toggle Button */
+        .nav-toggle-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: #333;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 18px;
+            z-index: 1000;
+            border-radius: 5px;
+        }
+
+        body.dark-mode .nav-toggle-btn {
+            background-color: #575757;
+        }
+
+        /* Theme Toggle Icon */
+        .toggle-icon {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #333;
+            z-index: 1000;
+            transition: color 0.3s;
+        }
+
+        body.dark-mode .toggle-icon {
+            color: white;
+        }
+
+        /* Content Styling */
+        .content {
+            margin-left: 220px; /* Leave space for side nav when open */
+            padding: 20px;
+            transition: margin-left 0.3s;
+        }
+
+        .content.full-width {
+            margin-left: 0; /* Full width when side nav is hidden */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #f4f4f4;
+        }
+
+        table img {
+            max-width: 100px;
+            max-height: 100px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Roadpatch Dashboard</h1>
+    </header>
+
+    <!-- Toggle Button for Navigation Bar -->
+    <button class="nav-toggle-btn" id="navToggleBtn">☰</button>
+
+    <!-- Side Navigation Bar -->
+    <nav class="side-nav" id="sideNav">
+        <a href="/upload_pothole">Report</a>
+        <a href="/admin">Admin Dashboard</a>
+        <a href="#contact">Contact Us</a>
+        <a href="#details">More Details</a>
+    </nav>
+
+    <!-- Theme Toggle Icon -->
+    <div class="toggle-icon" id="toggleTheme">🌙</div>
+
+    <!-- Main Content -->
+    <div class="content" id="content">
+        <h2>Previously Reported Potholes</h2>
+        {% if potholes %}
+            <table>
+                <tr>
+                    <th>Location</th>
+                    <th>Status</th>
+                    <th>Image</th>
+                </tr>
+                {% for pothole in potholes %}
+                <tr>
+                    <td>{{ pothole.location }}</td>
+                    <td>{{ pothole.status }}</td>
+                    <td><img src="{{ url_for('main.pothole_image', pothole_id=pothole.id) }}" alt="Pothole Image"></td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>No potholes reported yet.</p>
+        {% endif %}
+
+        <br>
+        {% if session.get('user_id') %}
+            <a href="{{ url_for('main.logout') }}" class="button">Logout</a>
+        {% else %}
+            <a href="{{ url_for('main.login') }}" class="button">Login</a>
+        {% endif %}
+    </div>
+
+    <script>
+        // Toggle Side Navigation
+        const navToggleBtn = document.getElementById('navToggleBtn');
+        const sideNav = document.getElementById('sideNav');
+        const content = document.getElementById('content');
+
+        navToggleBtn.addEventListener('click', () => {
+            sideNav.classList.toggle('open');
+            content.classList.toggle('full-width');
+        });
+
+        // Theme Toggle Logic
+        const toggleButton = document.getElementById('toggleTheme');
+        toggleButton.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            toggleButton.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+        });
+    </script>
+</body>
+</html>
+

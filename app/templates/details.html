@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pothole Details</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
+    <style>
+        /* Inline styles for details page */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        .details-container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .details-container h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .details-container p {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .details-container .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+
+        .details-container .stats div {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            width: 30%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .details-container .stats div h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .details-container .stats div p {
+            margin: 5px 0 0;
+            font-size: 14px;
+        }
+
+        .carousel-item img {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="details-container">
+        <h1>Pothole Details</h1>
+        <p>Potholes are depressions or holes in the road surface caused by the wear and tear of traffic and weather conditions. They can vary in size and depth, and if left unrepaired, they can cause significant damage to vehicles and pose safety risks to drivers and pedestrians.</p>
+        <p>Potholes are formed when water seeps into cracks in the road surface and weakens the underlying soil. As vehicles pass over these weakened areas, the road surface breaks down, creating a pothole. The freeze-thaw cycle in colder climates can exacerbate this process, leading to more frequent and severe potholes.</p>
+        <p>Here are some statistics related to potholes and accidents:</p>
+        <div class="stats">
+            <div>
+                <h2>120</h2>
+                <p>Accidents caused by potholes</p>
+            </div>
+            <div>
+                <h2>85%</h2>
+                <p>Drivers affected by potholes</p>
+            </div>
+            <div>
+                <h2>50</h2>
+                <p>Potholes reported this month</p>
+            </div>
+        </div>
+
+        <div id="potholeCarousel" class="carousel slide mt-5" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <img src="https://via.placeholder.com/1000x400" class="d-block w-100" alt="Pothole Image 1">
+                </div>
+                <div class="carousel-item">
+                    <img src="https://via.placeholder.com/1000x400" class="d-block w-100" alt="Pothole Image 2">
+                </div>
+                <div class="carousel-item">
+                    <img src="https://via.placeholder.com/1000x400" class="d-block w-100" alt="Pothole Image 3">
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#potholeCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#potholeCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
