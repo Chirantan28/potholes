@@ -50,6 +50,7 @@ def login():
 
         if user and check_password_hash(user.password, password):  # Use hash comparison
             session['user_id'] = user.id  # Store user ID in session
+            session['is_admin'] = user.is_admin
             flash('Login successful!', 'success')
             return redirect(url_for('main.dashboard'))  # Redirect to dashboard after successful login
         else:
@@ -117,7 +118,7 @@ def upload_pothole():
             return redirect(url_for('main.dashboard'))
 
         else:
-            flash('Invalid file type. Only PNG, JPG, WEBP, and JPEG are allowed.', 'error')
+            flash('Invalid file type. Only PNG, JPG, WEBP, JFIF and JPEG are allowed.', 'error')
 
     return render_template('upload.html')
 
