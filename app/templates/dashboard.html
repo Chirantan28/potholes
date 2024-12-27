@@ -1,54 +1,11 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-</head>
-<body>
-    <h1>Dashboard</h1>
-    
-    
-    <a href="/upload_pothole" class="button">Report a new Pothole</a><br><br>
 
-    <h2>Previously Reported Potholes</h2>
-    {% if potholes %}
-        <table>
-            <tr>
-                <th>Location</th>
-                <th>Status</th>
-                <th>Image</th>
-            </tr>
-            {% for pothole in potholes %}
-            <tr>
-                <td>{{ pothole.location }}</td>
-                <td>{{ pothole.status }}</td>
-                <td><img src="{{ url_for('main.pothole_image', pothole_id=pothole.id) }}" alt="Pothole Image">
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
-    {% else %}
-        <p>No potholes reported yet.</p>
-    {% endif %}
-
-    {% if session.get('user_id') %}
-   
-    <a href="{{ url_for('main.logout') }}">Logout</a>
-{% else %}
-   
-    <a href="{{ url_for('main.login') }}">Login</a>
-{% endif %}
-
-</body>
-</html>  -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
     <style>
         /* General Styling */
         body {
@@ -62,68 +19,30 @@
             color: #ffffff;
         }
 
-        header {
-            padding: 10px 20px;
-            background-color: #333;
-            color: white;
-            text-align: center;
-            font-size: 24px;
-        }
+       
 
-        /* Side Navigation Bar */
-        .side-nav {
-            position: fixed;
-            left: -200px; /* Hidden by default */
-            top: 0;
-            height: 100%;
-            width: 200px;
-            background-color: #333;
+        /* Horizontal Navbar */
+        .navbar {
             display: flex;
-            flex-direction: column;
-            padding-top: 60px;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
-            transition: left 0.3s;
+            justify-content: flex-start;
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
         }
 
-        .side-nav.open {
-            left: 0; /* Slide in when open */
-        }
-
-        .side-nav a {
+        .navbar a {
             color: white;
             padding: 15px 20px;
             text-decoration: none;
             transition: background-color 0.3s;
         }
 
-        .side-nav a:hover {
-            background-color: #575757;
-        }
-
-        /* Nav Toggle Button */
-        .nav-toggle-btn {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            background-color: #333;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            cursor: pointer;
-            font-size: 18px;
-            z-index: 1000;
-            border-radius: 5px;
-        }
-
-        body.dark-mode .nav-toggle-btn {
+        .navbar a:hover {
             background-color: #575757;
         }
 
         /* Theme Toggle Icon */
         .toggle-icon {
-            position: fixed;
-            top: 20px;
-            right: 20px;
             font-size: 24px;
             cursor: pointer;
             color: #333;
@@ -133,6 +52,19 @@
 
         body.dark-mode .toggle-icon {
             color: white;
+        }
+        header {
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
         }
 
         /* Content Styling */
@@ -178,28 +110,31 @@
         }
 
         .button:hover {
-            background-color: #0056b3;
+            background-color: red;
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Roadpatch Dashboard</h1>
-    </header>
+     <!-- Horizontal Navbar -->
+     <header>
+        <h1>Dashboard</h1>
+    <nav>
+        <ul class="navbar">
+            <li><a href="/upload_pothole">Report</a></li>
+            <li><a href="/">Home</a></li>
+            {% if session.get('user_id') and session.get('is_admin') %}
+            <li><a href="/admin">Admin Dashboard</a></li>
+            {% endif %}
+            <li><a href="#contact">Contact Us</a></li>
+            <li><a href="/details">More Details</a></li>
 
-    <!-- Toggle Button for Navigation Bar -->
-    <button class="nav-toggle-btn" id="navToggleBtn">☰</button>
-
-    <!-- Side Navigation Bar -->
-    <nav class="side-nav" id="sideNav">
-        <a href="/upload_pothole">Report</a>
-        <a href="/admin">Admin Dashboard</a>
-        <a href="#contact">Contact Us</a>
-        <a href="#details">More Details</a>
+        </ul>
     </nav>
+    
+</header>
 
-    <!-- Theme Toggle Icon -->
-    <div class="toggle-icon" id="toggleTheme">🌙</div>
+
+    
 
     <!-- Main Content -->
     <div class="content" id="content">

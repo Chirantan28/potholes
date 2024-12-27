@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pothole Details</title>
+    <!-- TailwindCSS -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         /* Additional styles for details page */
         .carousel-item img {
@@ -16,12 +19,11 @@
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
-    <nav class="bg-blue-600 p-4">
+    <nav style="background-color:  #333;" class="p-4">
         <div class="container mx-auto flex justify-between items-center">
             <a href="#" class="text-white text-2xl font-bold">RoadPatch</a>
             <div>
                 <a href="/" class="text-white mx-2">Home</a>
-                <a href="/admin" class="text-white mx-2">Admin Dashboard</a>
                 <a href="/logout" class="text-white mx-2">Logout</a>
             </div>
         </div>
@@ -73,49 +75,59 @@
             <h2 class="text-2xl font-bold mb-4">Year-wise Total Number of Road Accidents Due to Potholes</h2>
             <canvas id="accidentsChart" width="400" height="200"></canvas>
         </div>
+        <p>src:<a href="https://www.data.gov.in/resource/stateut-wise-total-number-road-accidents-happened-due-potholes-during-2020-and-2021">data.gov.in</a></p>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         const apiKey = "579b464db66ec23bdd000001560df4be67e34eb459d95bb3790729e0"; // Replace with your actual API key
         const apiUrl = "https://api.data.gov.in/resource/c1b4a741-9768-4936-aa44-f771a2176de5?format=json&api-key=" + apiKey;
 
         fetch(apiUrl)
-            .then(response => response.json())
-            .then(data => {
-                const records = data.records[0];
-                const years = [];
-                const accidents = [];
-
-                for (const year in records) {
-                    if (year.startsWith('_')) {
-                        years.push(year.substring(1));
-                        accidents.push(records[year]);
-                    }
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
                 }
+                return response.json();
+            })
+            .then(data => {
+                if (data.records && data.records.length > 0) {
+                    const records = data.records[0];
+                    const years = [];
+                    const accidents = [];
 
-                const ctx = document.getElementById('accidentsChart').getContext('2d');
-                const accidentsChart = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: years,
-                        datasets: [{
-                            label: 'Number of Accidents',
-                            data: accidents,
-                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                            borderColor: 'rgba(54, 162, 235, 1)',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
+                    for (const year in records) {
+                        if (year.startsWith('_')) {
+                            years.push(year.substring(1));
+                            accidents.push(records[year]);
                         }
                     }
-                });
+
+                    const ctx = document.getElementById('accidentsChart').getContext('2d');
+                    const accidentsChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: years,
+                            datasets: [{
+                                label: 'Number of Accidents',
+                                data: accidents,
+                                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                                borderColor: 'rgba(54, 162, 235, 1)',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    console.error('No records found');
+                }
             })
             .catch(error => console.error('Error fetching data:', error));
     </script>

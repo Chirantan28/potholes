@@ -3,34 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>Upload Pothole</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+   
     <style>
-        /* Include the same styles as previously used for the register page */
-        :root {
-            --background-color: #f0f4f8;
-            --form-background: #ffffff;
-            --text-color: #333333;
-            --button-color: #4CAF50;
-            --button-hover: #45a049;
-        }
-
-        body.dark-theme {
-            --background-color: #2c2c2c;
-            --form-background: #3e3e3e;
-            --text-color: #f0f0f0;
-            --button-color: #007BFF;
-            --button-hover: #0056b3;
-        }
+        
 
         body {
-            background-color: var(--background-color);
-            color: var(--text-color);
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
             margin: 0;
+            font-family: Arial, sans-serif;
             transition: background-color 0.3s, color 0.3s;
         }
 
@@ -101,116 +80,86 @@
             background-color: var(--button-hover);
         }
 
-        .theme-toggle {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: var(--button-color);
-            border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
-            color: white;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background-color 0.3s;
-        }
-
-        .theme-toggle:hover {
-            background-color: var(--button-hover);
-        }
-
-        /* Side Navigation Bar */
-        .side-nav {
-            position: fixed;
-            left: -200px;
-            top: 0;
-            height: 100%;
-            width: 200px;
-            background-color: #333;
+        /* Horizontal Navbar */
+        .navbar {
             display: flex;
-            flex-direction: column;
-            padding-top: 60px;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
-            transition: left 0.3s;
+            justify-content: flex-start;
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
         }
 
-        .side-nav.open {
-            left: 0;
-        }
-
-        .side-nav a {
+        .navbar a {
             color: white;
             padding: 15px 20px;
             text-decoration: none;
-            font-size: 16px;
             transition: background-color 0.3s;
         }
 
-        .side-nav a:hover {
+        .navbar a:hover {
             background-color: #575757;
-        }
-
-        /* Nav Toggle Button */
-        .nav-toggle-btn {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            background-color: #333;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            cursor: pointer;
-            font-size: 18px;
-            z-index: 1000;
-            border-radius: 5px;
-        }
-
-        body.dark-theme .nav-toggle-btn {
-            background-color: #575757;
-        }
-
-        /* Content Styling */
-        .container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin-left: 220px;
-            transition: margin-left 0.3s;
-        }
-
-        .container.full-width {
-            margin-left: 0;
         }
 
         /* Theme Toggle Icon */
         .toggle-icon {
-            position: fixed;
-            top: 20px;
-            right: 20px;
             font-size: 24px;
             cursor: pointer;
             color: #333;
             z-index: 1000;
             transition: color 0.3s;
         }
+
+        body.dark-mode .toggle-icon {
+            color: white;
+        }
+        header {
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .container {
+            
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-left: 10cm;
+        }
+       
     </style>
 </head>
 <body>
-    <!-- Toggle Button for Navigation Bar -->
-    <button class="nav-toggle-btn" id="navToggleBtn">☰</button>
+     <!-- Horizontal Navbar -->
+     <header>
+        <h1>Dashboard</h1>
+    <nav>
+        <ul class="navbar">
+            <li><a href="/dashboard">Dashboard</a></li>
+            <li><a href="/">Home</a></li>
+            {% if session.get('user_id') and session.get('is_admin') %}
+            <li><a href="/admin">Admin Dashboard</a></li>
+            {% endif %}
+            <li><a href="#contact">Contact Us</a></li>
+            <li><a href="/details">More Details</a></li>
 
-    <!-- Side Navigation Bar -->
-    <nav class="side-nav" id="sideNav">
-        <a href="/">Home</a>
-        <a href="/upload">Upload</a>
-        <a href="/admin">Admin</a>
+        </ul>
     </nav>
+    
+</header>
 
+<h1>Report a Pothole</h1>
     <!-- Main Content -->
     <div class="container" id="container">
         <div>
-            <h1>Report a Pothole</h1>
+            
             <form method="POST" enctype="multipart/form-data">
                 <label for="file">Upload Pothole Image:</label>
                 <input type="file" name="file" required>
@@ -223,16 +172,5 @@
         </div>
     </div>
 
-    <script>
-        // Toggle Side Navigation
-        const navToggleBtn = document.getElementById('navToggleBtn');
-        const sideNav = document.getElementById('sideNav');
-        const container = document.getElementById('container');
-
-        navToggleBtn.addEventListener('click', () => {
-            sideNav.classList.toggle('open');
-            container.classList.toggle('full-width');
-        });
-    </script>
 </body>
 </html>

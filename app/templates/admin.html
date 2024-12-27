@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    
     <style>
         /* Include the same styles as previously used for the register and upload pages */
         :root {
@@ -23,15 +23,8 @@
         }
 
         body {
-            background-color: var(--background-color);
-            color: var(--text-color);
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            min-height: 100vh;
             margin: 0;
+            font-family: Arial, sans-serif;
             transition: background-color 0.3s, color 0.3s;
         }
 
@@ -129,10 +122,69 @@
         form {
             display: inline;
         }
+        /* Horizontal Navbar */
+        .navbar {
+            display: flex;
+            justify-content: flex-start;
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .navbar a {
+            color: white;
+            padding: 15px 20px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .navbar a:hover {
+            background-color: #575757;
+        }
+
+        /* Theme Toggle Icon */
+        .toggle-icon {
+            font-size: 24px;
+            cursor: pointer;
+            color: #333;
+            z-index: 1000;
+            transition: color 0.3s;
+        }
+
+        body.dark-mode .toggle-icon {
+            color: white;
+        }
+        header {
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
     </style>
 </head>
 <body>
-    <h1>Admin Dashboard</h1>
+    <!-- Horizontal Navbar -->
+     <header>
+        <h1>Admin Dashboard</h1>
+    <nav>
+        <ul class="navbar">
+            <li><a href="#repairs">Repairs</a></li>
+            <li><a href="#locations">Locations</a></li>
+            <li><a href="/">Home</a></li>
+            <li><a href="#contact">Statistics</a></li>
+            <li><a href="#logout">Logout</a></li>
+
+        </ul>
+    </nav>
+</header>
+    
     <table>
         <thead>
             <tr>
