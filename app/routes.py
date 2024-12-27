@@ -1,6 +1,6 @@
 import os
 from flask import current_app,Blueprint, render_template, request, redirect, url_for,flash,session,Response
-from .models import Pothole,User,Reports
+from .models import Pothole,User,Reports,Maintenance
 from .extensions import db
 from werkzeug.security import generate_password_hash,check_password_hash
 from werkzeug.utils import secure_filename
@@ -121,6 +121,47 @@ def upload_pothole():
             flash('Invalid file type. Only PNG, JPG, WEBP, JFIF and JPEG are allowed.', 'error')
 
     return render_template('upload.html')
+
+@main.route('/repairs', methods=['GET', 'POST'])
+def repairs():
+    # Fetch all potholes with their maintenance records (if any)
+    potholes_with_repairs = Pothole.query.join(Maintenance).all()
+
+    # Fetch potholes from reports table for the "Add Maintenance" modal dropdown
+    reports = Reports.query.all()
+
+    if request.method == 'POST':
+        pothole_id = request.form['pothole_id']
+        maintenance_date = request.form['maintenance_date']
+        maintenance_type = request.form['maintenance_type']
+        cost = request.form['cost']
+        notes = request.form['notes']
+        file = request.files['file']
+
+        # Handle file upload
+        if file and allowed_file(file.filename):
+            file_data = file.read()
+        else:
+            file_data = None
+
+        # Add new maintenance record
+        new_maintenance = Maintenance(
+            pothole_id=pothole_id,
+            development_image=file_data,
+            maintenance_date=maintenance_date,
+            maintenance_type=maintenance_type,
+            cost=float(cost),
+            notes=notes
+        )
+        
+        db.session.add(new_maintenance)
+        db.session.commit()
+
+        flash('Maintenance added successfully!', 'success')
+        return redirect(url_for('main.repairs'))
+
+    return render_template('repairs.html', potholes_with_repairs=potholes_with_repairs, reports=reports)
+
 
 
 @main.route('/dashboard')

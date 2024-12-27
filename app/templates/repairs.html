@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Repairs - Pothole Management</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .container {
+            margin-top: 50px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            font-weight: bold;
+        }
+        /* Horizontal Navbar */
+        .navbar {
+            display: flex;
+            justify-content: flex-start;
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .navbar a {
+            color: white;
+            padding: 15px 20px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .navbar a:hover {
+            background-color: #575757;
+        }
+
+        /* Theme Toggle Icon */
+        .toggle-icon {
+            font-size: 24px;
+            cursor: pointer;
+            color: #333;
+            z-index: 1000;
+            transition: color 0.3s;
+        }
+
+        body.dark-mode .toggle-icon {
+            color: white;
+        }
+        header {
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+     <!-- Horizontal Navbar -->
+     <header>
+        <h1>Repairs</h1>
+    <nav>
+        <ul class="navbar">
+            <li><a href="/repairs">Repairs</a></li>
+            <li><a href="#locations">Locations</a></li>
+            <li><a href="/">Home</a></li>
+            <li><a href="#contact">Statistics</a></li>
+            <li><a href="/logout">Logout</a></li>
+
+        </ul>
+    </nav>
+</header>
+
+    <div class="container">
+        <h2>Maintenance Records</h2>
+        <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#addMaintenanceModal">Add Maintenance</button>
+    
+        <!-- List Potholes and Maintenance -->
+        {% if potholes_with_repairs %}
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Pothole Location</th>
+                        <th>Maintenance Date</th>
+                        <th>Maintenance Type</th>
+                        <th>Cost</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pothole in potholes_with_repairs %}
+                        {% for maintenance in pothole.maintenance %}
+                            <tr>
+                                <td>{{ pothole.location }}</td>
+                                <td>{{ maintenance.maintenance_date }}</td>
+                                <td>{{ maintenance.maintenance_type }}</td>
+                                <td>₹{{ maintenance.cost }}</td>
+                                <td>
+                                    <!-- Optionally add an edit/delete button if needed -->
+                                    <button class="btn btn-info btn-sm">Edit</button>
+                                    <button class="btn btn-danger btn-sm">Delete</button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No repairs or maintenance records found for potholes.</p>
+        {% endif %}
+    
+        <!-- Modal for Adding Maintenance -->
+        <div class="modal fade" id="addMaintenanceModal" tabindex="-1" role="dialog" aria-labelledby="addMaintenanceModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addMaintenanceModalLabel">Add Maintenance</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form method="POST" action="{{ url_for('main.repairs') }}" enctype="multipart/form-data">
+                        <div class="modal-body">
+                            <!-- Select Pothole from Reports Table -->
+                            <div class="form-group">
+                                <label for="pothole_id">Select Pothole:</label>
+                                <select name="pothole_id" id="pothole_id" class="form-control" required>
+                                    <option value="">Select a Pothole</option>
+                                    {% for report in reports %}
+                                        <option value="{{ report.pothole.id }}">{{ report.pothole.location }} (Reported by {{ report.user.username }})</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+    
+                            <!-- Maintenance Date -->
+                            <div class="form-group">
+                                <label for="maintenance_date">Maintenance Date:</label>
+                                <input type="date" id="maintenance_date" name="maintenance_date" class="form-control" required>
+                            </div>
+    
+                            <!-- Maintenance Type -->
+                            <div class="form-group">
+                                <label for="maintenance_type">Maintenance Type:</label>
+                                <input type="text" id="maintenance_type" name="maintenance_type" class="form-control" placeholder="e.g., Filling, Resurfacing" required>
+                            </div>
+    
+                            <!-- Cost -->
+                            <div class="form-group">
+                                <label for="cost">Cost (₹):</label>
+                                <input type="number" id="cost" name="cost" class="form-control" step="0.01" required>
+                            </div>
+    
+                            <!-- Notes -->
+                            <div class="form-group">
+                                <label for="notes">Notes:</label>
+                                <textarea id="notes" name="notes" class="form-control" rows="4"></textarea>
+                            </div>
+    
+                            <!-- Development Image (optional) -->
+                            <div class="form-group">
+                                <label for="file">Development Image (optional):</label>
+                                <input type="file" id="file" name="file" class="form-control-file">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save Maintenance</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+<!-- Flash Messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="alert alert-info mt-3">
+            {% for category, message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>

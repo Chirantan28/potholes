@@ -1,41 +1,3 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Page</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <div class="navbar">
-        <a href="/">Home</a>
-        <a href="/upload">Upload</a>
-        <a href="/admin">Admin</a>
-    </div>
-
-    <div class="container">
-        <div class="login-box">
-            <h2>Login</h2>
-            <form method="POST" action="/login">
-                <input type="text" name="username" placeholder="Username" required>
-                <input type="password" name="password" placeholder="Password" required>
-                <button type="submit">Login</button>
-            </form>
-        </div>
-    </div>
-    <p>Not registered? <a href="/register">Register Now!</a></p>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    <ul>
-      {% for category, message in messages %}
-        <li class="{{ category }}">{{ message }}</li>
-      {% endfor %}
-    </ul>
-  {% endif %}
-{% endwith %}
-
-</body>
-</html> -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -56,60 +18,28 @@
             color: #ffffff;
         }
 
-        /* Side Navigation Bar */
-        .side-nav {
-            position: fixed;
-            left: -200px; /* Hidden by default */
-            top: 0;
-            height: 100%;
-            width: 200px;
-            background-color: #333;
+       /* Horizontal Navbar */
+       .navbar {
             display: flex;
-            flex-direction: column;
-            padding-top: 60px;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
-            transition: left 0.3s;
+            justify-content: flex-start;
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
         }
 
-        .side-nav.open {
-            left: 0; /* Slide in when open */
-        }
-
-        .side-nav a {
+        .navbar a {
             color: white;
             padding: 15px 20px;
             text-decoration: none;
             transition: background-color 0.3s;
         }
 
-        .side-nav a:hover {
-            background-color: #575757;
-        }
-
-        /* Nav Toggle Button */
-        .nav-toggle-btn {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            background-color: #333;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            cursor: pointer;
-            font-size: 18px;
-            z-index: 1000;
-            border-radius: 5px;
-        }
-
-        body.dark-mode .nav-toggle-btn {
+        .navbar a:hover {
             background-color: #575757;
         }
 
         /* Theme Toggle Icon */
         .toggle-icon {
-            position: fixed;
-            top: 20px;
-            right: 20px;
             font-size: 24px;
             cursor: pointer;
             color: #333;
@@ -119,6 +49,19 @@
 
         body.dark-mode .toggle-icon {
             color: white;
+        }
+        header {
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
         }
 
         /* Content Styling */
@@ -143,6 +86,7 @@
             width: 100%;
             max-width: 400px;
             text-align: center;
+            margin-right: 6cm;
         }
 
         body.dark-mode .login-box {
@@ -217,19 +161,16 @@
     </style>
 </head>
 <body>
-    <!-- Toggle Button for Navigation Bar -->
-    <button class="nav-toggle-btn" id="navToggleBtn">☰</button>
+  
+    <header>
+        <h1>RoadPatch</h1>
+    <nav>
+        <ul class="navbar">
+            <li><a href="/">Back</a></li>
 
-    <!-- Side Navigation Bar -->
-    <nav class="side-nav" id="sideNav">
-        <a href="/">Home</a>
-        <a href="/upload_pothole">Upload</a>
-        <a href="/admin">Admin</a>
-    
+        </ul>
     </nav>
-
-    <!-- Theme Toggle Icon -->
-    <div class="toggle-icon" id="toggleTheme">🌙</div>
+</header>
 
     <!-- Main Content -->
     <div class="container" id="container">
@@ -259,24 +200,6 @@
         </ul>
     {% endif %}
     {% endwith %}
-
-    <script>
-        // Toggle Side Navigation
-        const navToggleBtn = document.getElementById('navToggleBtn');
-        const sideNav = document.getElementById('sideNav');
-        const container = document.getElementById('container');
-
-        navToggleBtn.addEventListener('click', () => {
-            sideNav.classList.toggle('open');
-            container.classList.toggle('full-width');
-        });
-
-        // Theme Toggle Logic
-        const toggleButton = document.getElementById('toggleTheme');
-        toggleButton.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-            toggleButton.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
-        });
-    </script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

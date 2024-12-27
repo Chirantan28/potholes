@@ -1,132 +1,70 @@
-
+/* General Styling */
 body {
-    font-family: 'Arial', sans-serif;
     margin: 0;
-    padding: 0;
-    background-color: #f9f9f9;
-    color: #333;
-    transition: background-color 0.5s, color 0.5s;
-}
-
-h1, h2, h3 {
-    text-align: center;
+    font-family: Arial, sans-serif;
+    transition: background-color 0.3s, color 0.3s;
 }
 
 /* Dark Mode */
 body.dark-mode {
     background-color: #121212;
-    color: #f0f0f0;
+    color: #ffffff;
 }
 
-body.dark-mode header {
-    background-color: #222;
-}
-
-body.dark-mode nav a {
-    background: #555;
-}
-
-body.dark-mode table {
-    background-color: #333;
-    color: #f0f0f0;
-}
-
-/* Header */
 header {
-    background: #007BFF;
-    color: #fff;
-    padding: 1em;
-    text-align: center;
-    animation: slideIn 1s ease-out;
-}
-
-/* Navigation Bar */
-nav {
+    padding: 10px 20px;
+    background-color: #333;
+    color: white;
     display: flex;
-    justify-content: center;
-    gap: 15px;
-    padding: 10px;
-    background: #28a745;
+    justify-content: space-between;
+    align-items: center;
 }
 
-nav a, nav button {
+header h1 {
+    margin: 0;
+    font-size: 24px;
+}
+
+/* Navbar */
+.navbar {
+    display: flex;
+    justify-content: flex-start;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.navbar a {
+    color: white;
+    padding: 15px 20px;
     text-decoration: none;
-    color: #fff;
-    background: #007BFF;
-    padding: 10px 15px;
-    border-radius: 5px;
-    transition: background 0.3s, transform 0.3s;
+    transition: background-color 0.3s;
 }
 
-nav a:hover, nav button:hover {
-    background: #0056b3;
-    transform: scale(1.1);
+.navbar a:hover {
+    background-color: #575757;
 }
 
-button {
-    border: none;
+/* Theme Toggle Icon */
+.toggle-icon {
+    font-size: 24px;
     cursor: pointer;
+    color: #333;
+    z-index: 1000;
+    transition: color 0.3s;
 }
 
-/* Carousel */
-.carousel {
-    margin: 20px auto;
-    height: 50%;
-    width: 100%;
-    overflow: hidden;
-    position: relative;
+body.dark-mode .toggle-icon {
+    color: white;
 }
 
-.carousel-container img {
-    display: block; /* Ensure the image is visible */
-    max-height: 50vh; /* Limit the image height to 50% of the viewport height */
-    width: auto; /* Maintain aspect ratio */
-    margin: 0 auto; /* Center the image horizontally */
-    border-radius: 10px;
-    object-fit: contain; /* Ensure the entire image fits without cropping */
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+/* Specific styles for light and dark modes */
+body.dark-mode header {
+    background-color: #1e1e1e;
 }
 
-
-/* Table */
-table {
-    width: 80%;
-    margin: 20px auto;
-    border-collapse: collapse;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+body.dark-mode .navbar a {
+    color: #ccc;
 }
 
-th, td {
-    padding: 12px;
-    text-align: center;
-    border: 1px solid #ddd;
-}
-
-th {
-    background: #007BFF;
-    color: #fff;
-}
-
-tr:nth-child(even) {
-    background-color: #f2f2f2;
-}
-
-/* Contact Section */
-footer {
-    text-align: center;
-    padding: 10px;
-    background: #007BFF;
-    color: #fff;
-}
-
-/* Animations */
-@keyframes slideIn {
-    from {
-        transform: translateY(-50px);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
+/* Apply styles for other elements here */

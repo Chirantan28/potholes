@@ -27,3 +27,19 @@ class Reports(db.Model):
 
     def __repr__(self):
         return f"<Report id={self.id} user_id={self.uid} pothole_id={self.pid}>"
+    
+class Maintenance(db.Model):
+    __tablename__ = 'maintenance'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    pothole_id = db.Column(db.Integer, db.ForeignKey('potholes.id'), nullable=False)
+    development_image = db.Column(LargeBinary, nullable=True)
+    maintenance_date = db.Column(db.Date, nullable=False)
+    maintenance_type = db.Column(db.String(100), nullable=False)
+    cost = db.Column(db.Float, nullable=False)
+    notes = db.Column(db.String(500), nullable=True)
+
+    pothole = db.relationship('Pothole', backref=db.backref('maintenance', lazy=True))
+
+    def __repr__(self):
+        return f"<Maintenance id={self.id} pothole_id={self.pothole_id} date={self.maintenance_date} type={self.maintenance_type}>"
