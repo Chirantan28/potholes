@@ -1,0 +1,28 @@
+<!-- templates/video_detection.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pothole Detection Stream</title>
+    <style>
+        .video-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .video-feed {
+            width: 100%;
+            border: 2px solid #333;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="video-container">
+        <h1>Live Pothole Detection</h1>
+        <img class="video-feed" src="{{ url_for('main.video_feed') }}">
+        <div class="detection-info">
+            <p>Status: Processing video feed for potholes...</p>
+        </div>
+    </div>
+</body>
+</html>
