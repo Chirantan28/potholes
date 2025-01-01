@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -80,7 +80,7 @@
             background-color: var(--button-hover);
         }
 
-        /* Horizontal Navbar */
+        
         .navbar {
             display: flex;
             justify-content: flex-start;
@@ -137,7 +137,7 @@
     </style>
 </head>
 <body>
-     <!-- Horizontal Navbar -->
+     
      <header>
         <h1>Dashboard</h1>
     <nav>
@@ -156,7 +156,7 @@
 </header>
 
 <h1>Report a Pothole</h1>
-    <!-- Main Content -->
+   
     <div class="container" id="container">
         <div>
             
@@ -172,5 +172,65 @@
         </div>
     </div>
 
+</body>
+</html> -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report a Pothole</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 text-gray-800">
+    <nav class="bg-blue-600 p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="#" class="text-white text-2xl font-bold">RoadPatch</a>
+            <div>
+                <a href="/" class="text-white mx-2">Home</a>
+                <a href="/admin" class="text-white mx-2">Admin Dashboard</a>
+                <a href="/logout" class="text-white mx-2">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
+        <h1 class="text-3xl font-bold text-center mb-6">Report a Pothole</h1>
+        <form method="POST" enctype="multipart/form-data">
+            <div class="mb-4">
+                <label for="file" class="block text-gray-700">Upload Pothole Image:</label>
+                <input type="file" name="file" required class="mt-1 block w-full">
+            </div>
+            <div class="mb-4">
+                <label for="location" class="block text-gray-700">Location:</label>
+                <input type="text" name="location" id="location" required class="mt-1 block w-full">
+            </div>
+            <div class="mb-4">
+                <input type="checkbox" id="autoLocation" class="mr-2">
+                <label for="autoLocation" class="text-gray-700">Use my current location</label>
+            </div>
+            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Submit</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('autoLocation').addEventListener('change', function() {
+            if (this.checked) {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function(position) {
+                        const lat = position.coords.latitude;
+                        const lon = position.coords.longitude;
+                        document.getElementById('location').value = `${lat}, ${lon}`;
+                    }, function(error) {
+                        console.error('Error getting location:', error);
+                    });
+                } else {
+                    alert('Geolocation is not supported by this browser.');
+                }
+            } else {
+                document.getElementById('location').value = '';
+            }
+        });
+    </script>
 </body>
 </html>
