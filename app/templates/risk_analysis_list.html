@@ -2,20 +2,285 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Potholes List</title>
+    <title>Risk Analysis</title>
+    <style>
+        :root {
+            --background-color: #f0f4f8;
+            --form-background: #ffffff;
+            --text-color: #333333;
+            --button-color: #4CAF50;
+            --button-hover: #45a049;
+        }
+
+        body.dark-theme {
+            --background-color: #2c2c2c;
+            --form-background: #3e3e3e;
+            --text-color: #f0f0f0;
+            --button-color: #007BFF;
+            --button-hover: #0056b3;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        h1, h2 {
+            text-align: center;
+        }
+
+        table {
+            width: 80%;
+            border-collapse: collapse;
+            margin: 20px auto;
+            background-color: var(--form-background);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: var(--background-color);
+            color: black;
+        }
+
+        img {
+            width: 100px;
+            height: auto;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+        }
+
+        #rb {
+            text-decoration: none;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            background-color: var(--button-color);
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        #rb:hover {
+            background-color: var(--button-hover);
+        }
+
+        a {
+            display: inline-block;
+        }
+
+        p {
+            text-align: center;
+            font-size: 1.2em;
+        }
+
+        /* Zoomed Image Modal */
+        #zoomModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        #zoomModal img {
+            width: 80%;
+            max-width: 900px;
+            height: auto;
+        }
+
+        #zoomModal .close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: #fff;
+            font-size: 30px;
+            cursor: pointer;
+        }
+
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            background-color: var(--button-color);
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: var(--button-hover);
+        }
+
+        form {
+            display: inline;
+        }
+        /* Horizontal Navbar */
+        .navbar {
+            display: flex;
+            justify-content: flex-start;
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .navbar a {
+            color: white;
+            padding: 15px 20px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .navbar a:hover {
+            background-color: #575757;
+        }
+
+        /* Theme Toggle Icon */
+        .toggle-icon {
+            font-size: 24px;
+            cursor: pointer;
+            color: #333;
+            z-index: 1000;
+            transition: color 0.3s;
+        }
+
+        body.dark-mode .toggle-icon {
+            color: white;
+        }
+        header {
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Potholes</h1>
-    <ul>
-        {% for pothole in potholes %}
-            <li>
-                Pothole ID: {{ pothole.id }} - Location: {{ pothole.location }}
-                <a href="{{ url_for('main.risk_analysis', pothole_id=pothole.id) }}">
-                    <button>Analyze Risk</button>
-                </a>
-            </li>
-        {% endfor %}
-    </ul>
+    <header>
+        <h1>Risk Analysis</h1>
+    <nav>
+        <ul class="navbar">
+            <li><a href="/repairs">Repairs</a></li>
+            <li><a href="/risk_analysis_dash">Risk Analysis</a></li>
+            <li><a href="/">Home</a></li>
+            <li><a href="#contact">Statistics</a></li>
+            <li><a href="/logout">Logout</a></li>
+
+        </ul>
+    </nav>
+</header>
+   
+    <!-- Section for Potholes with Risk Analysis -->
+    <h2>Potholes with Risk Analysis</h2>
+    {% if potholes_with_risks %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Risk Level</th>
+                    <th>Priority</th>
+                    <th>Image</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pothole in potholes_with_risks %}
+                    <tr>
+                        <td>{{ pothole.pid }}</td>
+                        <td>{{ pothole.risk }}</td>
+                        <td>{{ pothole.priority }}</td>
+                        <td>
+                            {% if pothole.rpic %}
+                                <img src="data:image/jpeg;base64,{{ pothole.rpic | b64encode | safe }}" alt="Pothole Image" onclick="zoomImage(this)">
+                            {% else %}
+                                No Image Available
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No potholes with risk analysis found.</p>
+    {% endif %}
+
+    <div id="zoomModal">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <img id="zoomedImage" src="" alt="Zoomed Pothole Image">
+    </div>
+
+    <!-- Section for Potholes Without Risk Analysis -->
+    <h2>Potholes Without Risk Analysis</h2>
+    {% if potholes_without_risks %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pothole in potholes_without_risks %}
+                    <tr>
+                        <td>{{ pothole.id }}</td>
+                        <td>
+                            <a id="rb" href="{{ url_for('main.risk_analysis', pothole_id=pothole.id) }}">
+                                Analyze Risk
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>All potholes have been analyzed.</p>
+    {% endif %}
+
+    <script>
+        // Function to open the zoomed image modal
+        function zoomImage(img) {
+            var modal = document.getElementById('zoomModal');
+            var zoomedImg = document.getElementById('zoomedImage');
+            modal.style.display = "flex";
+            zoomedImg.src = img.src;
+        }
+
+        // Function to close the zoomed image modal
+        function closeModal() {
+            var modal = document.getElementById('zoomModal');
+            modal.style.display = "none";
+        }
+
+        // Close the modal if clicked outside the image
+        window.onclick = function(event) {
+            var modal = document.getElementById('zoomModal');
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+    </script>
 </body>
 </html>

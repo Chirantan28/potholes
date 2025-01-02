@@ -12,3 +12,4 @@ connection = engine.connect()
 print("Connected successfully!")
 # Initialize SQLAlchemy
 db = SQLAlchemy(app)
+

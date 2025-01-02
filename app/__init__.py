@@ -2,6 +2,7 @@ import os
 from flask import Flask
 from .extensions import db
 from .routes import main  # Only import 'main' blueprint here
+import base64
 
 def create_app():
     app = Flask(__name__)
@@ -18,5 +19,9 @@ def create_app():
         os.makedirs(app.config['UPLOAD_FOLDER'])
     app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'webp','jfif'}
     app.register_blueprint(main)
+
+    @app.template_filter('b64encode')
+    def b64encode_filter(data):
+            return base64.b64encode(data).decode('utf-8')
 
     return app

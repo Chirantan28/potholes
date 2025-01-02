@@ -1,11 +1,13 @@
 import os
 from flask import current_app,Blueprint, render_template, request, redirect, url_for,flash,session,Response
-from .models import Pothole,User,Reports,Maintenance
+from .models import Pothole,User,Reports,Maintenance,Risks
 from .extensions import db
 from werkzeug.security import generate_password_hash,check_password_hash
 from werkzeug.utils import secure_filename
 from PIL import Image, ImageOps,  ImageDraw, ImageFont
 import numpy as np
+from io import BytesIO
+from sqlalchemy import update
 import tensorflow as tf
 from keras.models import load_model
 from keras.layers import DepthwiseConv2D
@@ -14,10 +16,12 @@ import torchvision.transforms as transforms
 from datetime import datetime
 import io
 import cv2
-
+from sqlalchemy.exc import SQLAlchemyError
 
 
 main = Blueprint('main', __name__)
+
+
 
 @main.route('/')
 def home():
@@ -288,38 +292,91 @@ class PotholeDetector:
         return class_name[2:], confidence_score
 
 
-# Route to list potholes
-@main.route('/risk_analysis', methods=['GET'])
+@main.route('/risk_analysis_dash', methods=['GET'])
 def risk_analysis_list():
-    potholes = Pothole.query.all()  # Fetch all potholes from the database
-    return render_template("risk_analysis_list.html", potholes=potholes)
+    # Fetch all potholes from the database
+    all_potholes = Pothole.query.all()
 
-# Route to perform risk analysis for a pothole
+    # Fetch all records from the risks table
+    all_risks = Risks.query.all()
+
+    # Create a set of pothole IDs that already have risks analyzed
+    analyzed_pothole_ids = {risk.pid for risk in all_risks}
+
+    # Separate potholes into those with and without risk analysis
+    potholes_with_risks = [pothole for pothole in all_risks if pothole.pid in analyzed_pothole_ids]
+    potholes_without_risks = [pothole for pothole in all_potholes if pothole.id not in analyzed_pothole_ids]
+
+    # Render the template with both lists
+    return render_template(
+        "risk_analysis_list.html",
+        potholes_with_risks=potholes_with_risks,
+        potholes_without_risks=potholes_without_risks,
+    )
+
+
 @main.route('/risk_analysis/<int:pothole_id>', methods=['GET'])
 def risk_analysis(pothole_id):
     pothole = Pothole.query.get_or_404(pothole_id)
 
     if pothole.image:
         try:
-            MODEL_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__),'..', 'models', 'best.pt'))
+            MODEL_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'models', 'best.pt'))
             # Load YOLO model for depth estimation
-            model = torch.hub.load('ultralytics/yolov5', 'custom', path=MODEL_PATH, source='local')
-            
+            model = torch.hub.load('yolov5', 'custom', path=MODEL_PATH, source='local')
+
             # Read the pothole image (from database or filesystem)
             image = cv2.imdecode(np.frombuffer(pothole.image, np.uint8), cv2.IMREAD_COLOR)
 
             # Run YOLO model on the image
             result = model(image)
-            result.show()
+            processed_image = result.render()[0]
+            success, encoded_image = cv2.imencode('.jpg', processed_image)
+            if not success:
+                raise ValueError("Failed to encode the processed image.")
 
-            # Extract the coordinates and calculate depth
-            coordinatesList = result.xyxy[0]  # Get coordinates of detected objects
-            depth_value = calculate_depth(coordinatesList)
+            # Convert encoded image to binary
+            image_binary = encoded_image.tobytes()
 
-            # Categorize risk based on depth
-            risk_level = categorize_risk(depth_value)
+            # Extract the labels and confidence from the model output
+            labels = result.names
+            print(labels)  # Get the class labels (e.g., "safe", "medium risk", etc.)
+            confidence = result.xyxy[0][:, 4]  # Confidence of detections
 
-            return render_template("risk_analysis.html", depth=depth_value, risk=risk_level, pothole_id=pothole_id)
+            # Assuming model's output can directly indicate the risk level (for example, 'safe', 'medium risk', 'high risk')
+            risk_level = "Safe"  # Default value
+            for label, conf in zip(labels, confidence):
+                if label == 2 and conf > 0.5:
+                    risk_level = "High Risk"
+                elif label == 1 and conf > 0.5:
+                    risk_level = "Medium Risk"
+                elif label == 0 and conf > 0.5:
+                    risk_level = "Low Risk"
+
+            # Set priority based on risk level
+            priority = "High" if risk_level == "High Risk" else "Medium" if risk_level == "Medium Risk" else "Low"
+
+            # Update the risks table
+            try:
+                # Fetch the existing record or create a new one
+                risk_record = Risks.query.filter_by(pid=pothole_id).first()
+                if risk_record:
+                    risk_record.risk = risk_level
+                    risk_record.priority = priority
+                    risk_record.rpic = image_binary  # Optional: Store the analyzed image
+                else:
+                    # Create a new record if it doesn't exist
+                    new_risk = Risks(pid=pothole_id, risk=risk_level, priority=priority, rpic=image_binary)
+                    db.session.add(new_risk)
+
+                db.session.commit()
+                flash("Risk analysis completed successfully.", 'success')
+            except SQLAlchemyError as e:
+                db.session.rollback()
+                flash(f"Database error: {str(e)}", 'error')
+
+            # Reload the current page to show the updated risk analysis without redirect
+            return redirect(url_for('main.risk_analysis_dash'))  # Assuming 'main.dashboard' is the correct route
 
         except Exception as e:
             flash(f'Error processing image: {str(e)}', 'error')
@@ -328,19 +385,3 @@ def risk_analysis(pothole_id):
 
     flash("Pothole image not available.", 'error')
     return redirect(url_for('main.dashboard'))
-
-# Calculate depth from coordinates (modify as needed based on your logic)
-def calculate_depth(coordinates):
-    # You can use the coordinates to calculate depth based on specific criteria
-    depth_value = sum([coord[2] for coord in coordinates]) / len(coordinates)  # Example calculation
-    return depth_value
-
-
-# Categorize the risk based on depth value
-def categorize_risk(depth_value):
-    if depth_value < 0.1:
-        return "Low Risk"
-    elif 0.1 <= depth_value <= 0.3:
-        return "Medium Risk"
-    else:
-        return "High Risk"
