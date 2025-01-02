@@ -202,6 +202,7 @@
                     <th>ID</th>
                     <th>Risk Level</th>
                     <th>Priority</th>
+                    <th>Depth(cm)</th>
                     <th>Image</th>
                 </tr>
             </thead>
@@ -211,6 +212,7 @@
                         <td>{{ pothole.pid }}</td>
                         <td>{{ pothole.risk }}</td>
                         <td>{{ pothole.priority }}</td>
+                        <td>{{pothole.depth}}</td>
                         <td>
                             {% if pothole.rpic %}
                                 <img src="data:image/jpeg;base64,{{ pothole.rpic | b64encode | safe }}" alt="Pothole Image" onclick="zoomImage(this)">

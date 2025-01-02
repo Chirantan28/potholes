@@ -293,7 +293,7 @@ class PotholeDetector:
 
 
 @main.route('/risk_analysis_dash', methods=['GET'])
-def risk_analysis_list():
+def risk_analysis_dash():
     # Fetch all potholes from the database
     all_potholes = Pothole.query.all()
 
@@ -321,11 +321,15 @@ def risk_analysis(pothole_id):
 
     if pothole.image:
         try:
-            MODEL_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'models', 'best.pt'))
-            # Load YOLO model for depth estimation
-            model = torch.hub.load('yolov5', 'custom', path=MODEL_PATH, source='local')
+            # Load YOLO model for pothole detection
+            YOLO_MODEL_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'models', 'best.pt'))
+            model = torch.hub.load('yolov5', 'custom', path=YOLO_MODEL_PATH, source='local')
 
-            # Read the pothole image (from database or filesystem)
+            # Load depth estimation model
+            DEPTH_MODEL_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'models', 'modelforDepth.h5'))
+            depth_model = load_model(DEPTH_MODEL_PATH)
+
+            # Read the pothole image
             image = cv2.imdecode(np.frombuffer(pothole.image, np.uint8), cv2.IMREAD_COLOR)
 
             # Run YOLO model on the image
@@ -337,14 +341,32 @@ def risk_analysis(pothole_id):
 
             # Convert encoded image to binary
             image_binary = encoded_image.tobytes()
+            coordinate_lines = result.xyxy[0]
 
-            # Extract the labels and confidence from the model output
+            depth = None
+            for i in coordinate_lines:
+                try:
+                    # Crop the region of interest (ROI)
+                    x1, y1, x2, y2 = map(int, i[:4])
+                    roi = image[y1:y2, x1:x2]
+
+                    # Convert ROI to grayscale and preprocess for depth model
+                    gray_roi = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+                    resized_roi = cv2.resize(gray_roi, (128, 128))
+                    roi_array = np.expand_dims(resized_roi, axis=0) / 255.0  # Normalize pixel values
+
+                    # Predict depth
+                    depth_prediction = depth_model.predict(np.expand_dims(roi_array, axis=-1))
+                    depth = float(depth_prediction[0][0][0][0])  # Extract depth value
+                except Exception as e:
+                    print(f"Error estimating depth: {e}")
+                    continue
+
+            # Determine risk level
             labels = result.names
-            print(labels)  # Get the class labels (e.g., "safe", "medium risk", etc.)
-            confidence = result.xyxy[0][:, 4]  # Confidence of detections
+            confidence = result.xyxy[0][:, 4]
 
-            # Assuming model's output can directly indicate the risk level (for example, 'safe', 'medium risk', 'high risk')
-            risk_level = "Safe"  # Default value
+            risk_level = "Safe"
             for label, conf in zip(labels, confidence):
                 if label == 2 and conf > 0.5:
                     risk_level = "High Risk"
@@ -353,35 +375,33 @@ def risk_analysis(pothole_id):
                 elif label == 0 and conf > 0.5:
                     risk_level = "Low Risk"
 
-            # Set priority based on risk level
+            # Set priority
             priority = "High" if risk_level == "High Risk" else "Medium" if risk_level == "Medium Risk" else "Low"
 
-            # Update the risks table
+            # Update the database
             try:
-                # Fetch the existing record or create a new one
                 risk_record = Risks.query.filter_by(pid=pothole_id).first()
                 if risk_record:
                     risk_record.risk = risk_level
                     risk_record.priority = priority
-                    risk_record.rpic = image_binary  # Optional: Store the analyzed image
+                    risk_record.depth = depth 
+                    risk_record.rpic = image_binary
                 else:
-                    # Create a new record if it doesn't exist
-                    new_risk = Risks(pid=pothole_id, risk=risk_level, priority=priority, rpic=image_binary)
+                    new_risk = Risks(pid=pothole_id, risk=risk_level, priority=priority, depth=depth, rpic=image_binary)
                     db.session.add(new_risk)
 
                 db.session.commit()
-                flash("Risk analysis completed successfully.", 'success')
+                flash("Risk analysis and depth estimation completed successfully.", 'success')
             except SQLAlchemyError as e:
                 db.session.rollback()
                 flash(f"Database error: {str(e)}", 'error')
 
-            # Reload the current page to show the updated risk analysis without redirect
-            return redirect(url_for('main.risk_analysis_dash'))  # Assuming 'main.dashboard' is the correct route
+            return redirect(url_for('main.risk_analysis_dash'))
 
         except Exception as e:
             flash(f'Error processing image: {str(e)}', 'error')
             print(e)
-            return redirect(url_for('main.dashboard'))
+            return redirect(url_for('main.risk_analysis_dash'))
 
     flash("Pothole image not available.", 'error')
-    return redirect(url_for('main.dashboard'))
+    return redirect(url_for('main.risk_analysis_dash'))

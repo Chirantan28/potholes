@@ -50,3 +50,4 @@ class Risks(db.Model):
     risk = db.Column(db.String(100), nullable=True)
     priority = db.Column(db.String(100), nullable=True)
     rpic = db.Column(db.LargeBinary, nullable=True)
+    depth = db.Column(db.Float)  
