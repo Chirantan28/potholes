@@ -9,8 +9,11 @@ import numpy as np
 import tensorflow as tf
 from keras.models import load_model
 from keras.layers import DepthwiseConv2D
+import torch
+import torchvision.transforms as transforms
 from datetime import datetime
 import io
+import cv2
 
 
 
@@ -284,3 +287,60 @@ class PotholeDetector:
         
         return class_name[2:], confidence_score
 
+
+# Route to list potholes
+@main.route('/risk_analysis', methods=['GET'])
+def risk_analysis_list():
+    potholes = Pothole.query.all()  # Fetch all potholes from the database
+    return render_template("risk_analysis_list.html", potholes=potholes)
+
+# Route to perform risk analysis for a pothole
+@main.route('/risk_analysis/<int:pothole_id>', methods=['GET'])
+def risk_analysis(pothole_id):
+    pothole = Pothole.query.get_or_404(pothole_id)
+
+    if pothole.image:
+        try:
+            MODEL_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__),'..', 'models', 'best.pt'))
+            # Load YOLO model for depth estimation
+            model = torch.hub.load('ultralytics/yolov5', 'custom', path=MODEL_PATH, source='local')
+            
+            # Read the pothole image (from database or filesystem)
+            image = cv2.imdecode(np.frombuffer(pothole.image, np.uint8), cv2.IMREAD_COLOR)
+
+            # Run YOLO model on the image
+            result = model(image)
+            result.show()
+
+            # Extract the coordinates and calculate depth
+            coordinatesList = result.xyxy[0]  # Get coordinates of detected objects
+            depth_value = calculate_depth(coordinatesList)
+
+            # Categorize risk based on depth
+            risk_level = categorize_risk(depth_value)
+
+            return render_template("risk_analysis.html", depth=depth_value, risk=risk_level, pothole_id=pothole_id)
+
+        except Exception as e:
+            flash(f'Error processing image: {str(e)}', 'error')
+            print(e)
+            return redirect(url_for('main.dashboard'))
+
+    flash("Pothole image not available.", 'error')
+    return redirect(url_for('main.dashboard'))
+
+# Calculate depth from coordinates (modify as needed based on your logic)
+def calculate_depth(coordinates):
+    # You can use the coordinates to calculate depth based on specific criteria
+    depth_value = sum([coord[2] for coord in coordinates]) / len(coordinates)  # Example calculation
+    return depth_value
+
+
+# Categorize the risk based on depth value
+def categorize_risk(depth_value):
+    if depth_value < 0.1:
+        return "Low Risk"
+    elif 0.1 <= depth_value <= 0.3:
+        return "Medium Risk"
+    else:
+        return "High Risk"

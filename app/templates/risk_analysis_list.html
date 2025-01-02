@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Potholes List</title>
+</head>
+<body>
+    <h1>Potholes</h1>
+    <ul>
+        {% for pothole in potholes %}
+            <li>
+                Pothole ID: {{ pothole.id }} - Location: {{ pothole.location }}
+                <a href="{{ url_for('main.risk_analysis', pothole_id=pothole.id) }}">
+                    <button>Analyze Risk</button>
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
