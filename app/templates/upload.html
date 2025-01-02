@@ -8,6 +8,166 @@
         body {
             margin: 0;
             font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        form {
+            background-color: #f9f9f9;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007BFF;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .location-checkbox {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        #map {
+            height: 400px;
+            width: 100%;
+            margin-top: 20px;
+            display: none;
+        }
+
+        #map.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>RoadPatch</h1>
+    </header>
+
+    <div class="container">
+        <h1>Report a Pothole</h1>
+        <form method="POST" enctype="multipart/form-data" id="uploadForm">
+            <label for="file">Upload Pothole Image:</label>
+            <input type="file" name="file" id="file" accept="image/*" required>
+
+            <label for="location">Location:</label>
+            <input type="text" name="location" id="location" required>
+
+            <div class="location-checkbox">
+                <input type="checkbox" id="autoLocation">
+                <label for="autoLocation">Use my current location</label>
+            </div>
+
+            <div id="map"></div>
+
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    <script>
+        let map;
+        let marker;
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: -34.397, lng: 150.644 },
+                zoom: 8
+            });
+        }
+
+        document.getElementById('autoLocation').addEventListener('change', function() {
+            if (this.checked) {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function(position) {
+                        const lat = position.coords.latitude;
+                        const lon = position.coords.longitude;
+
+                        // Update location input
+                        document.getElementById('location').value = `${lat}, ${lon}`;
+
+                        // Display map and update marker
+                        const latLng = new google.maps.LatLng(lat, lon);
+                        document.getElementById('map').classList.add('active');
+                        map.setCenter(latLng);
+                        map.setZoom(15);
+
+                        if (marker) {
+                            marker.setPosition(latLng);
+                        } else {
+                            marker = new google.maps.Marker({
+                                position: latLng,
+                                map: map
+                            });
+                        }
+                    }, function(error) {
+                        alert(`Error getting location: ${error.message}`);
+                        document.getElementById('autoLocation').checked = false;
+                    });
+                } else {
+                    alert('Geolocation is not supported by this browser.');
+                    this.checked = false;
+                }
+            } else {
+                document.getElementById('location').value = '';
+                document.getElementById('map').classList.remove('active');
+                if (marker) {
+                    marker.setMap(null);
+                    marker = null;
+                }
+            }
+        });
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAR43jUoPTiNpTyqj8jlJcupR2-g9OFHKo&callback=initMap" async defer></script>
+</body>
+</html>
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report a Pothole</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
             transition: background-color 0.3s, color 0.3s;
         }
 
@@ -247,124 +407,6 @@
         
     </script>
 </body>
-</html>
-
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Report a Pothole</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <style>
-        #map {
-            height: 400px;
-            width: 100%;
-            margin-top: 20px;
-        }
-    </style>
-</head>
-<body class="bg-gray-100 text-gray-800">
-    <nav class="bg-blue-600 p-4">
-        <div class="container mx-auto flex justify-between items-center">
-            <a href="#" class="text-white text-2xl font-bold">RoadPatch</a>
-            <div>
-                <a href="/" class="text-white mx-2">Home</a>
-                <a href="/admin" class="text-white mx-2">Admin Dashboard</a>
-                <a href="/logout" class="text-white mx-2">Logout</a>
-            </div>
-        </div>
-    </nav>
-
-    <div class="container mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
-        <h1 class="text-3xl font-bold text-center mb-6">Report a Pothole</h1>
-        <form method="POST" enctype="multipart/form-data">
-            <div class="mb-4">
-                <label for="file" class="block text-gray-700">Upload Pothole Image:</label>
-                <input type="file" name="file" required class="mt-1 block w-full">
-            </div>
-            <div class="mb-4">
-                <label for="location" class="block text-gray-700">Location:</label>
-                <input type="text" name="location" id="location" required class="mt-1 block w-full">
-            </div>
-            <div class="mb-4">
-                <input type="checkbox" id="autoLocation" class="mr-2">
-                <label for="autoLocation" class="text-gray-700">Use my current location</label>
-            </div>
-            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Submit</button>
-        </form>
-        <div id="map"></div>
-    </div>
-
-    <script>
-        let map;
-        let marker;
-
-        function initMap() {
-            map = new google.maps.Map(document.getElementById('map'), {
-                center: { lat: -34.397, lng: 150.644 },
-                zoom: 8
-            });
-        }
-
-        document.getElementById('autoLocation').addEventListener('change', function() {
-            if (this.checked) {
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(function(position) {
-                        const lat = position.coords.latitude;
-                        const lon = position.coords.longitude;
-                        const apiKey = 'AIzaSyAR43jUoPTiNpTyqj8jlJcupR2-g9OFHKo'; // Replace with your actual API key
-                        const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lon}&key=${apiKey}`;
-
-                        fetch(geocodeUrl)
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.status === 'OK' && data.results.length > 0) {
-                                    const address = data.results[0].formatted_address;
-                                    document.getElementById('location').value = `${address} (${lat}, ${lon})`;
-
-                                    // Update map and marker
-                                    const latLng = new google.maps.LatLng(lat, lon);
-                                    map.setCenter(latLng);
-                                    map.setZoom(15);
-                                    if (marker) {
-                                        marker.setPosition(latLng);
-                                    } else {
-                                        marker = new google.maps.Marker({
-                                            position: latLng,
-                                            map: map
-                                        });
-                                    }
-                                    console.log('Marker set at:', latLng);
-                                } else {
-                                    console.error('Geocoding API error:', data);
-                                    document.getElementById('location').value = `${lat}, ${lon}`;
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error fetching geocode data:', error);
-                                document.getElementById('location').value = `${lat}, ${lon}`;
-                            });
-                    }, function(error) {
-                        console.error('Error getting location:', error);
-                        alert('Error getting location: ' + error.message);
-                    }, {
-                        enableHighAccuracy: true,
-                        timeout: 10000,
-                        maximumAge: 0
-                    });
-                } else {
-                    alert('Geolocation is not supported by this browser.');
-                }
-            } else {
-                document.getElementById('location').value = '';
-                if (marker) {
-                    marker.setMap(null);
-                    marker = null;
-                }
-            }
-        });
-    </script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAR43jUoPTiNpTyqj8jlJcupR2-g9OFHKo&callback=initMap" async defer></script>
-</body>
 </html> -->
+
+
