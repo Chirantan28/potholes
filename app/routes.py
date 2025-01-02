@@ -111,6 +111,7 @@ def upload_pothole():
             return redirect(request.url)
             
         file = request.files['file']
+        image_binary = file.read()
         location = request.form['location']
         
         if file and allowed_file(file.filename):
@@ -164,7 +165,7 @@ def upload_pothole():
                     user_id = session['user_id']
                     
                     new_pothole = Pothole(
-                        image=file_data,  # Using the annotated image
+                        image=image_binary,  # Using the annotated image
                         location=location,
                         status='Pending'
                     )
@@ -357,26 +358,21 @@ def risk_analysis(pothole_id):
 
                     # Predict depth
                     depth_prediction = depth_model.predict(np.expand_dims(roi_array, axis=-1))
-                    depth = float(depth_prediction[0][0][0][0])  # Extract depth value
+                    depth = float(depth_prediction[0][0][0][0]) 
                 except Exception as e:
                     print(f"Error estimating depth: {e}")
                     continue
 
-            # Determine risk level
-            labels = result.names
-            confidence = result.xyxy[0][:, 4]
-
-            risk_level = "Safe"
-            for label, conf in zip(labels, confidence):
-                if label == 2 and conf > 0.5:
-                    risk_level = "High Risk"
-                elif label == 1 and conf > 0.5:
-                    risk_level = "Medium Risk"
-                elif label == 0 and conf > 0.5:
-                    risk_level = "Low Risk"
-
-            # Set priority
-            priority = "High" if risk_level == "High Risk" else "Medium" if risk_level == "Medium Risk" else "Low"
+            # Determine risk level based on depth
+            if depth <= 5:
+                risk_level = "Low Risk"
+                priority = "Low"
+            elif 5 < depth <= 10:
+                risk_level = "Medium Risk"
+                priority = "Medium"
+            else:
+                risk_level = "High Risk"
+                priority = "High"
 
             # Update the database
             try:
