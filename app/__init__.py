@@ -7,7 +7,7 @@ def create_app():
     app = Flask(__name__)
     app.secret_key = 'b28d1c7f84b7419d3fa428ffcbf0f5fa' 
     # Set the database URI (update with your actual database credentials)
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:Chirantana2814%40@localhost:3306/pothole_system'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:mySQL@localhost:3306/pothole_system'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     # Initialize the database
