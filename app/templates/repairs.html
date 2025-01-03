@@ -66,16 +66,16 @@
      <!-- Horizontal Navbar -->
      <header>
         <h1>Repairs</h1>
-    <nav>
-        <ul class="navbar">
-            <li><a href="/repairs">Repairs</a></li>
-            <li><a href="#locations">Locations</a></li>
-            <li><a href="/">Home</a></li>
-            <li><a href="#contact">Statistics</a></li>
-            <li><a href="/logout">Logout</a></li>
-
-        </ul>
-    </nav>
+        <nav>
+            <ul class="navbar">
+                <li><a href="/repairs">Repairs</a></li>
+                <li><a href="/risk_analysis_dash">Risk Analysis</a></li>
+                <li><a href="/">Home</a></li>
+                <li><a href="#contact">Statistics</a></li>
+                <li><a href="/logout">Logout</a></li>
+    
+            </ul>
+        </nav>
 </header>
 
     <div class="container">
@@ -179,17 +179,6 @@
         </div>
     </div>
     
-
-<!-- Flash Messages -->
-{% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        <div class="alert alert-info mt-3">
-            {% for category, message in messages %}
-                <p>{{ message }}</p>
-            {% endfor %}
-        </div>
-    {% endif %}
-{% endwith %}
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>

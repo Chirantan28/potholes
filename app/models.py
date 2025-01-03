@@ -43,3 +43,11 @@ class Maintenance(db.Model):
 
     def __repr__(self):
         return f"<Maintenance id={self.id} pothole_id={self.pothole_id} date={self.maintenance_date} type={self.maintenance_type}>"
+    
+class Risks(db.Model):
+    __tablename__ = 'risks'
+    pid = db.Column(db.Integer, primary_key=True)
+    risk = db.Column(db.String(100), nullable=True)
+    priority = db.Column(db.String(100), nullable=True)
+    rpic = db.Column(db.LargeBinary, nullable=True)
+    depth = db.Column(db.Float)  
