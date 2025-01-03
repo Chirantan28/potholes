@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f4f4f4;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: flex-start;
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .navbar a {
+            color: white;
+            padding: 15px 20px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .navbar a:hover {
+            background-color: #575757;
+        }
+
+        header {
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Statistics</h1>
+        <nav>
+            <ul class="navbar">
+                {% if session.get('user_id') and session.get('is_admin') %}
+                <li><a href="/repairs">Repairs</a></li>
+                <li><a href="/risk_analysis_dash">Risk Analysis</a></li>
+                {% endif %}
+                <li><a href="/">Home</a></li>
+                <li><a href="/statistics">Statistics</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
+        <h1 class="text-3xl font-bold text-center mb-6">Daily Statistics</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Number of Potholes Uploaded</th>
+                    <th>Number of Potholes Repaired</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data will be populated here -->
+                {% for stat in statistics %}
+                <tr>
+                    <td>{{ stat.date }}</td>
+                    <td>{{ stat.uploaded }}</td>
+                    <td>{{ stat.repaired }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

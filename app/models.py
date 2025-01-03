@@ -1,5 +1,6 @@
 from . import db
 from sqlalchemy import LargeBinary
+from datetime import datetime
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -14,6 +15,8 @@ class Pothole(db.Model):
     location = db.Column(db.String(200))
     status = db.Column(db.String(50), default='Pending')
     image = db.Column(LargeBinary, nullable=False)
+    report_date = db.Column(db.DateTime, default=datetime.utcnow)
+
 
 class Reports(db.Model):
     __tablename__ = 'reports'

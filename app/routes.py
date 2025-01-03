@@ -7,13 +7,13 @@ from werkzeug.utils import secure_filename
 from PIL import Image, ImageOps,  ImageDraw, ImageFont
 import numpy as np
 from io import BytesIO
-from sqlalchemy import update
+from sqlalchemy import update,func,case
 import tensorflow as tf
-from keras.models import load_model
-from keras.layers import DepthwiseConv2D
+from keras.models import load_model # type: ignore
+from keras.layers import DepthwiseConv2D # type: ignore
 import torch
 import torchvision.transforms as transforms
-from datetime import datetime
+from datetime import datetime,timedelta
 import io
 import cv2
 from sqlalchemy.exc import SQLAlchemyError
@@ -401,3 +401,16 @@ def risk_analysis(pothole_id):
 
     flash("Pothole image not available.", 'error')
     return redirect(url_for('main.risk_analysis_dash'))
+
+
+@main.route('/statistics')
+def statistics():
+    today = datetime.utcnow().date()
+    statistics_data = db.session.query(
+        func.date(Pothole.report_date).label('date'),
+        func.count(Pothole.id).label('uploaded'),
+        func.sum(case((Pothole.status == 'Repaired', 1), else_=0)).label('repaired')
+    ).group_by(func.date(Pothole.report_date)).all()
+
+    statistics = [{'date': stat.date, 'uploaded': stat.uploaded, 'repaired': stat.repaired} for stat in statistics_data]
+    return render_template('statistics.html', statistics=statistics)
